@@ -2,7 +2,7 @@ pipeline {
   agent none
 
   stages {
-    stage('App checks') {
+    stage('Continuous Integration') {
       agent {
         // Jenkins will auto checkout the code before running the steps (Default behavior of Jenkins when using a docker agent)
         dockerfile {
@@ -47,7 +47,7 @@ pipeline {
     }
 
     // This can run on different env, that's why first checkout scm.
-    stage('Continous Delivery') {
+    stage('Continuous Delivery') {
       agent any
       
       stages {
@@ -64,27 +64,24 @@ pipeline {
           when {
             branch 'main'
           }
-        }
-        steps {
 
-          withCredentials([usernamePassword(credentialsId: 'ghcr-token-homepage', 
-                                            passwordVariable: 'GH_PAT', 
-                                            usernameVariable: 'GH_USER')]) {
-              // 1. Authenticate 
-              // We use \$ to ensure the shell handles the secret safely
-              sh "echo \$GH_PAT | docker login ghcr.io -u \$GH_USER --password-stdin"
-              
-              // 2. Tag and Push 
-              // GHCR requires lowercase, so we call .toLowerCase() on the Groovy variable
-              sh "docker tag homepage:test ghcr.io/${GH_USER.toLowerCase()}/homepage:${env.BUILD_ID}"
-              sh "docker push ghcr.io/${GH_USER.toLowerCase()}/homepage:${env.BUILD_ID}"
+          steps {
+
+            withCredentials([usernamePassword(credentialsId: 'ghcr-token-homepage', 
+                                              passwordVariable: 'GH_PAT', 
+                                              usernameVariable: 'GH_USER')]) {
+                // 1. Authenticate 
+                // We use \$ to ensure the shell handles the secret safely
+                sh "echo \$env.GH_PAT | docker login ghcr.io -u \$env.GH_USER --password-stdin"
+                
+                // 2. Tag and Push 
+                // GHCR requires lowercase, so we call .toLowerCase() on the Groovy variable
+                sh "docker tag homepage:test ghcr.io/${env.GH_USER.toLowerCase()}/homepage:${env.BUILD_ID}"
+                sh "docker push ghcr.io/${env.GH_USER.toLowerCase()}/homepage:${env.BUILD_ID}"
+            }
           }
-
         }
-
       }
-
     }
   }
 }
-// Testa
