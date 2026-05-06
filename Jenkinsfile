@@ -8,7 +8,7 @@ pipeline {
         dockerfile {
           filename 'Dockerfile'
           additionalBuildArgs '--target=deps'
-          args '-u root'
+          args '-u 1000:1000'
         }
       }
       //  Nested stages to run in the same container
