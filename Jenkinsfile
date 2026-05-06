@@ -44,6 +44,19 @@ pipeline {
           }
         }
       }   
+
+
+      post {
+        cleanup {
+          echo "Cleaning Continuous Delivery workspace..."
+          cleanWs(
+            cleanWhenNotBuilt: false,
+            deleteDirs: true,
+            disableDeferredWipeout: true,
+            notFailBuild: true
+          )
+        }
+      }
     }
 
     // This can run on different env, that's why first checkout scm.
@@ -91,6 +104,19 @@ pipeline {
           }
         }
       }
+
+      post {
+        cleanup {
+          echo "Cleaning Continuous Delivery workspace..."
+          cleanWs(
+            cleanWhenNotBuilt: false,
+            deleteDirs: true,
+            disableDeferredWipeout: true,
+            notFailBuild: true
+          )
+        }
+      }
+
     }
   }
 
@@ -109,16 +135,6 @@ pipeline {
 
     changed {
       echo "Build status changed compared to the previous run."
-    }
-
-    cleanup {
-      echo "Cleaning workspace..."
-      cleanWs(
-        cleanWhenNotBuilt: false,
-        deleteDirs: true,
-        disableDeferredWipeout: true,
-        notFailBuild: true
-      )
     }
   }
 }
