@@ -65,6 +65,10 @@ pipeline {
             branch 'main'
           }
 
+          environment {
+            DOCKER_CONFIG = "${WORKSPACE}/.docker-${BUILD_NUMBER}"
+          }
+
           steps {
             withCredentials([
               usernamePassword(
@@ -75,7 +79,7 @@ pipeline {
             ]) {
               sh '''
                 set +x
-
+                mkdir -p "$DOCKER_CONFIG"
                 printf "%s" "$GH_PAT" | docker login ghcr.io -u "$GH_USER" --password-stdin
 
                 IMAGE_OWNER=$(printf "%s" "$GH_USER" | tr "[:upper:]" "[:lower:]")
@@ -87,6 +91,34 @@ pipeline {
           }
         }
       }
+    }
+  }
+
+  post {
+    success {
+      echo "Pipeline succeeded: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+    }
+
+    failure {
+      echo "Pipeline failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+    }
+
+    unstable {
+      echo "Pipeline unstable: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+    }
+
+    changed {
+      echo "Build status changed compared to the previous run."
+    }
+
+    cleanup {
+      echo "Cleaning workspace..."
+      cleanWs(
+        cleanWhenNotBuilt: false,
+        deleteDirs: true,
+        disableDeferredWipeout: true,
+        notFailBuild: true
+      )
     }
   }
 }
