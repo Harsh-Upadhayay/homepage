@@ -47,7 +47,7 @@ pipeline {
 
 
       post {
-        cleanup {
+        always {
           echo "Cleaning Continuous Delivery workspace..."
           cleanWs(
             cleanWhenNotBuilt: false,
@@ -106,7 +106,7 @@ pipeline {
       }
 
       post {
-        cleanup {
+        always {
           echo "Cleaning Continuous Delivery workspace..."
           cleanWs(
             cleanWhenNotBuilt: false,
