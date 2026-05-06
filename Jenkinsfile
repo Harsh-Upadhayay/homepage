@@ -13,6 +13,7 @@ pipeline {
       }
       //  Nested stages to run in the same container
       stages {
+
         stage('Check node version') {
           steps {
             sh 'node -v'
@@ -46,12 +47,43 @@ pipeline {
     }
 
     // This can run on different env, that's why first checkout scm.
-    stage('Build Docker image') {
+    stage('Continous Delivery') {
       agent any
-      steps {
-        checkout scm
-        sh 'docker build -t homepage:test .'
+      
+      stages {
+
+        stage('Build Image') {
+          steps {
+            checkout scm
+            sh 'docker build -t homepage:test .'
+          }
+        }
+
+        // Only runs on actions on main.
+        stage ('Push to GHCR') {
+          when {
+            branch 'main'
+          }
+        }
+        steps {
+
+          withCredentials([usernamePassword(credentialsId: 'ghcr-token-homepage', 
+                                            passwordVariable: 'GH_PAT', 
+                                            usernameVariable: 'GH_USER')]) {
+              // 1. Authenticate 
+              // We use \$ to ensure the shell handles the secret safely
+              sh "echo \$GH_PAT | docker login ghcr.io -u \$GH_USER --password-stdin"
+              
+              // 2. Tag and Push 
+              // GHCR requires lowercase, so we call .toLowerCase() on the Groovy variable
+              sh "docker tag homepage:test ghcr.io/${GH_USER.toLowerCase()}/homepage:${env.BUILD_ID}"
+              sh "docker push ghcr.io/${GH_USER.toLowerCase()}/homepage:${env.BUILD_ID}"
+          }
+
+        }
+
       }
+
     }
   }
 }
