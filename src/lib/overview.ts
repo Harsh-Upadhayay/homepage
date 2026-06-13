@@ -29,6 +29,12 @@ export type CheckedService = {
 export type Overview = {
   meta: {
     ownerName: string;
+    ownerRole: string | null;
+    ownerTagline: string | null;
+    ownerGithubUrl: string | null;
+    ownerLinkedinUrl: string | null;
+    ownerResumeUrl: string | null;
+    ownerContactEmail: string | null;
     domain: string;
     refreshedAt: string;
     cacheTtlMs: number;
@@ -475,6 +481,12 @@ async function buildOverview(): Promise<Overview> {
   return {
     meta: {
       ownerName: OWNER_NAME,
+      ownerRole: process.env.HOMEPAGE_ROLE ?? null,
+      ownerTagline: process.env.HOMEPAGE_TAGLINE ?? null,
+      ownerGithubUrl: process.env.HOMEPAGE_GITHUB_URL || null,
+      ownerLinkedinUrl: process.env.HOMEPAGE_LINKEDIN_URL || null,
+      ownerResumeUrl: process.env.HOMEPAGE_RESUME_URL || null,
+      ownerContactEmail: process.env.HOMEPAGE_CONTACT_EMAIL || null,
       domain: DOMAIN,
       refreshedAt: new Date().toISOString(),
       cacheTtlMs: CACHE_TTL_MS,

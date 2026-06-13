@@ -15,9 +15,9 @@ const monoFont = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "neovara.uk | Homelab Platform",
+  title: "Harsh Upadhayay · Homelab Platform",
   description:
-    "Interactive architecture and live service topology for the neovara.uk homelab platform.",
+    "A self-hosted, production-grade homelab: zero-trust auth, GPU inference, full observability, and automated CI/CD — all on one machine.",
   icons: {
     icon: "/favicon.svg",
   },
